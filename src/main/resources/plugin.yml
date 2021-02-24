@@ -1,0 +1,37 @@
+name: AtSomeone
+version: ${project.version}
+main: io.github.biligoldenwater.atsomeone.AtSomeone
+authors: [Golden_Water]
+commands:
+  atsomeone:
+    description: Plugin main command.
+    usage: /aso help
+    aliases: [aso]
+permissions:
+  atsomeone.*:
+    default: op
+    description: All permissions in the plugin.
+    children:
+      atsomeone.atall:
+        default: op
+        description: Allow player to @ all players.
+      atsomeone.bypass.*:
+        default: op
+        description: All bypass permission.
+        children:
+          atsomeone.bypass.ignore:
+            default: op
+            description: Let you can bypass the ignore that @ player.
+      atsomeone.command.*:
+        default: op
+        description: All command permission.
+        children:
+          atsomeone.command.help:
+            default: true
+            description: Show help message.
+          atsomeone.command.ignore:
+            default: op
+            description: Let a player cannot @ you.
+          atsomeone.command.reload:
+            default: op
+            description: Reload config.
