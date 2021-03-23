@@ -1,6 +1,6 @@
 package io.github.biligoldenwater.atsomeone.commands;
 
-import io.github.biligoldenwater.atsomeone.modules.CheckPermissions;
+import io.github.biligoldenwater.atsomeone.utils.CheckPermissions;
 import io.github.biligoldenwater.atsomeone.config.HashMapLoadAndSave;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
