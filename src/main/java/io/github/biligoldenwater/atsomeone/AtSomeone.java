@@ -8,7 +8,7 @@ import io.github.biligoldenwater.atsomeone.utils.I18nManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
+import java.util.*;
 
 public final class AtSomeone extends JavaPlugin {
     private final AtSomeone instance = this;
