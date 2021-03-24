@@ -1,0 +1,11 @@
+{
+  "warn_noPerm": "§cYou don't have permission.",
+  "warn_onlyPlayerCanUse": "§cOnly player can use this command!",
+  "help_usage_help": "Usage: /aso help (Show this message.)",
+  "help_usage_ignore": "Usage: /aso ignore <player> (Add or Remove someone in ignore list.)",
+  "help_usage_resetLang": "Usage: /aso resetLang (Reset language files.)",
+  "help_usage_reload": "Usage: /aso reload (Reload config.)",
+  "cmd_reload_success": "Config and Languages are reloaded.",
+  "cmd_ignore_removed": "Success to remove {{playerName}} from you ignore list",
+  "cmd_ignore_added": "Success ignore {{playerName}}."
+}

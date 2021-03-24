@@ -21,9 +21,10 @@ public class OnPlayerChatTabCompleteEvent implements Listener {
             if (CheckPermissions.hasPermissions(event.getPlayer(), "atsomeone.atall") && ("[@All]".toLowerCase().startsWith(token.toLowerCase()) || "@All]".toLowerCase().startsWith(token.toLowerCase()))) {
                 completions.add("[@All]");
             }
+            
             for (Player i : Bukkit.getOnlinePlayers()) {
-                String completion = "[@" + i.getName().toLowerCase() + "]";
-                if (completion.startsWith(token.toLowerCase()) || completion.substring(1).startsWith(token.toLowerCase())) {
+                String completion = "[@" + i.getName() + "]";
+                if (completion.startsWith(token) || completion.substring(1).startsWith(token)) {
                     completions.add(completion);
                 }
             }

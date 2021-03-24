@@ -16,34 +16,37 @@ public class TabAtSomeone {
         plugin.getCommand("atsomeone").setTabCompleter(atsomeone_tab);
     }
 
-    TabCompleter atsomeone_tab = new TabCompleter() {
-        @Override
-        public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-            List<String> completions = new ArrayList<>();
-            switch (args.length) {
-                case 1:
-                    if (CheckPermissions.hasPermissions(sender, "atsomeone.command.help") && "help".startsWith(args[0]))
-                        completions.add("help");
-                    if (CheckPermissions.hasPermissions(sender, "atsomeone.command.ignore") && "ignore".startsWith(args[0]))
-                        completions.add("ignore");
-                    if (CheckPermissions.hasPermissions(sender, "atsomeone.command.reload") && "reload".startsWith(args[0]))
-                        completions.add("reload");
-                    return completions;
-                case 2:
-                    switch (args[0]) {
-                        case "ignore":
-                            if (!CheckPermissions.hasPermissions(sender, "atsomeone.command.ignore")) {
-                                return completions;
-                            }
-                            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                                if (player.getName().startsWith(args[1])) {
-                                    completions.add(player.getName());
-                                }
-                            }
+    TabCompleter atsomeone_tab = (sender, command, alias, args) -> { //CommandSender Command String String[]
+        List<String> completions = new ArrayList<>();
+        switch (args.length) {
+            case 1:
+                args[0] = args[0].toLowerCase();
+                if (CheckPermissions.hasPermissions(sender, "atsomeone.command.help") && "help".startsWith(args[0]))
+                    completions.add("help");
+                if (CheckPermissions.hasPermissions(sender, "atsomeone.command.ignore") && "ignore".startsWith(args[0]))
+                    completions.add("ignore");
+                if (CheckPermissions.hasPermissions(sender, "atsomeone.command.resetLang") && "resetLang".startsWith(args[0]))
+                    completions.add("resetLang");
+                if (CheckPermissions.hasPermissions(sender, "atsomeone.command.reload") && "reload".startsWith(args[0]))
+                    completions.add("reload");
+                return completions;
+            case 2:
+                switch (args[0]) {
+                    case "ignore":
+                        args[1] = args[1].toLowerCase();
+
+                        if (!CheckPermissions.hasPermissions(sender, "atsomeone.command.ignore")) {
                             return completions;
-                    }
-            }
-            return null;
+                        }
+
+                        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                            if (player.getName().toLowerCase().startsWith(args[1])) {
+                                completions.add(player.getName());
+                            }
+                        }
+                        return completions;
+                }
         }
+        return null;
     };
 }

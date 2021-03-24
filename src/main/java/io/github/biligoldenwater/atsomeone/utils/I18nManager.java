@@ -2,11 +2,11 @@ package io.github.biligoldenwater.atsomeone.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.github.biligoldenwater.atsomeone.AtSomeone;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,8 +16,11 @@ import java.util.Map;
 
 public class I18nManager {
     private final Map<String, Map<String, String>> languages = new HashMap<>();
-    private boolean initialized = false;
     private String defaultLanguage = "en_us";
+    private boolean initialized = false;
+    private File dataPath;
+
+    private final Gson gson = new Gson();
 
 
     public I18nManager(File dataPath, String langFolder, String defaultLanguage) {
@@ -41,6 +44,7 @@ public class I18nManager {
     }
 
     public int initialize(File languageFilePath, String defaultLanguage) {
+        this.dataPath = languageFilePath;
         this.defaultLanguage = defaultLanguage;
 
         if (!languageFilePath.exists()) {
@@ -49,8 +53,6 @@ public class I18nManager {
             }
         }
         if (!languageFilePath.isDirectory()) return StatusCode.pathError; // 如果不是一个目录则返回错误
-
-        Gson gson = new Gson();
 
         File[] files = languageFilePath.listFiles(file -> { // 获取目录下所有json文件
             String fileName = file.getName();
@@ -82,24 +84,55 @@ public class I18nManager {
     }
 
     public String getL10n(String lang, String key) {
-        if (!initialized) return "";
-        Map<String, String> langData = languages.get(lang);
+        if (!initialized) return ""; // 检查 初始化 是否完成
+        Map<String, String> langData = languages.get(lang.toLowerCase()); // 获取 指定语言的 数据
 
-        if (langData == null || langData.get(key) == null) {
-            Map<String, String> defaultLangData = languages.get(defaultLanguage);
-            if (defaultLangData == null || defaultLangData.get(key) == null) {
-                return key;
+        if (langData == null || langData.get(key) == null) { // 如果 指定语言不存在 或 指定语言中 没有 指定数据
+            Map<String, String> defaultLangData = languages.get(defaultLanguage); // 获取 默认语言的 数据
+
+            if (defaultLangData == null || defaultLangData.get(key) == null) { // 如果 默认语言不存在 或 默认语言中 没有 指定数据
+                return key; // 返回 键
             } else {
-                return languages.get(defaultLanguage).get(key);
+                return defaultLangData.get(key); // 返回 默认语言中 的 指定数据
             }
         }
 
-        return langData.get(key);
+        return langData.get(key); // 返回 指定语言中 的 指定数据
     }
 
-    public void releaseDefaultLangFile(JavaPlugin plugin, String folderInJar, String langListFileName) {
+    public void releaseDefaultLangFile(JavaPlugin plugin, String folderInJar,
+                                       String langListFileName, boolean replace) {
         InputStream inputStream = plugin.getResource(folderInJar + "/" + langListFileName);
-        
+
+        if (inputStream == null) return;
+
+        try {
+            int fileLength = inputStream.available();
+            byte[] data = new byte[fileLength];
+
+            if (inputStream.read(data) != -1) {
+                String jsonStr;
+
+                jsonStr = new String(data, StandardCharsets.UTF_8);
+                jsonStr = jsonStr.replaceAll("\n", "")
+                        .replaceAll("\r", "");
+
+                Map<String, String[]> languages =
+                        gson.fromJson(jsonStr, new TypeToken<Map<String, String[]>>() {
+                        }.getType());
+
+                for (String langCode : languages.get("languages")) {
+                    plugin.saveResource(folderInJar + "/" + langCode + ".json", replace);
+                }
+
+                this.reload();
+            }
+        } catch (IOException ignored) {
+        }
+    }
+
+    public void reload() {
+        this.initialized = initialize(dataPath, defaultLanguage.toLowerCase()) == StatusCode.success;
     }
 
     public static class StatusCode {

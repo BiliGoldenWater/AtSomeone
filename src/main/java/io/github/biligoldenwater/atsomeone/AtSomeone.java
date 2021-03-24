@@ -8,8 +8,11 @@ import io.github.biligoldenwater.atsomeone.utils.I18nManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+
 public final class AtSomeone extends JavaPlugin {
     private final AtSomeone instance = this;
+    private I18nManager i18nManager;
 
     @Override
     public void onEnable() {
@@ -20,8 +23,8 @@ public final class AtSomeone extends JavaPlugin {
         new TabAtSomeone(this);
         saveDefaultConfig();
 
-        I18nManager i18nManager = new I18nManager(getDataFolder(), "lang", "en_US");
-        i18nManager.releaseDefaultLangFile(this, "lang", "langList.json");
+        i18nManager = new I18nManager(getDataFolder(), "lang", "en_US");
+        i18nManager.releaseDefaultLangFile(this, "lang", "langList.json", false);
 
         getLogger().info("AtSomeone enabled");
     }
@@ -35,6 +38,10 @@ public final class AtSomeone extends JavaPlugin {
 
     public AtSomeone getInstance() {
         return instance;
+    }
+
+    public I18nManager getI18nManager() {
+        return i18nManager;
     }
 }
 

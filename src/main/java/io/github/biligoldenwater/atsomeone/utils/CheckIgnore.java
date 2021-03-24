@@ -6,22 +6,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static io.github.biligoldenwater.atsomeone.utils.CheckPermissions.hasPermissions;
+
 public class CheckIgnore {
     public static boolean isIgnore(HashMap<Object, Object> hm, Player playerBeAt, Player initiatedPlayer) {
         List<String> ignoreList = (List<String>) hm.get(playerBeAt.getName());
-        boolean canAdd = false;
+        boolean ignore = false;
 
         if (ignoreList == null) ignoreList = new ArrayList<>();
-        if (ignoreList.isEmpty()) {
-            ignoreList.add("[holder]");
-        }
+
+//        if (!ignoreList.isEmpty()) {
+//
+//        }
 
         for (String playerInIgnoreList : ignoreList) {
-            if (playerInIgnoreList.equalsIgnoreCase(initiatedPlayer.getName()) && !CheckPermissions.hasPermissions(initiatedPlayer, "atsomeone.bypass.ignore")) {
-                canAdd = true;
+            boolean inIgnoreList = playerInIgnoreList.equalsIgnoreCase(initiatedPlayer.getName());
+            boolean hasBypassPerm = hasPermissions(initiatedPlayer, "atsomeone.bypass.ignore");
+
+            if (inIgnoreList && !hasBypassPerm) {
+                ignore = true;
             }
         }
 
-        return canAdd;
+
+        return ignore;
     }
 }

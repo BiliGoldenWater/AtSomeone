@@ -1,6 +1,6 @@
 package io.github.biligoldenwater.atsomeone.listener;
 
-import io.github.biligoldenwater.atsomeone.config.HashMapLoadAndSave;
+import io.github.biligoldenwater.atsomeone.utils.HashMapLoadAndSave;
 import io.github.biligoldenwater.atsomeone.utils.CheckIgnore;
 import org.bukkit.Instrument;
 import org.bukkit.Note;
@@ -13,7 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-import static io.github.biligoldenwater.atsomeone.utils.SplitString.splitString;
 import static org.bukkit.Bukkit.getOnlinePlayers;
 import static org.bukkit.Bukkit.getPluginManager;
 
@@ -33,7 +32,7 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
 
         List<Player> atPlayer = new ArrayList<>();
         Collection<? extends Player> onlinePlayers = getOnlinePlayers();
-        String[] strs = splitString("[|]", message);
+        String[] strs = message.split("[\\[\\]]");
 
         boolean isAtAll = false;
         boolean hasAt = false;
@@ -81,9 +80,13 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
             e.setMessage(finalMessage.toString());
             for (Player atPlayer2 : atPlayer) {
                 if (strs.length > 1) {
-                    atPlayer2.sendTitle("§b你被§d" + e.getPlayer().getName() + "§b@了", "§d" + e.getPlayer().getName() + "§b@了你并对你说: " + finalMessage, 10, 80, 10);
+                    atPlayer2.sendTitle("§b你被§d" + e.getPlayer().getName() + "§b@了",
+                            "§d" + e.getPlayer().getName() + "§b@了你并对你说: " + finalMessage,
+                            10, 80, 10);
                 } else {
-                    atPlayer2.sendTitle("§b你被§d" + e.getPlayer().getName() + "§b@了", "§d" + e.getPlayer().getName() + "§b@了你.", 10, 80, 10);
+                    atPlayer2.sendTitle("§b你被§d" + e.getPlayer().getName() + "§b@了",
+                            "§d" + e.getPlayer().getName() + "§b@了你.",
+                            10, 80, 10);
                 }
 
                 atPlayer2.sendMessage("§b你被§d" + e.getPlayer().getName() + "§b@了. 打开聊天栏输入@按Tab即可使用@.");
@@ -96,7 +99,10 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
                         count++;
                         if (count > 2) cancel();
                     }
-                }.runTaskTimerAsynchronously(Objects.requireNonNull(getPluginManager().getPlugin("AtSomeone")), 0, 2);
+                }.runTaskTimerAsynchronously(
+                        Objects.requireNonNull(getPluginManager().getPlugin("AtSomeone")),
+                        0,
+                        2);
             }
         }
     }
