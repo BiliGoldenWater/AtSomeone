@@ -1,6 +1,6 @@
 {
-  "warn_noPerm": "§c你没有权限.",
-  "warn_onlyPlayerCanUse": "§c只有玩家可以使用此命令!",
+  "error_noPerm": "§c你没有权限.",
+  "error_onlyPlayerCanUse": "§c只有玩家可以使用此命令!",
   "help_usage_help": "用法: /aso help (显示这条消息.)",
   "help_usage_ignore": "用法: /aso ignore <玩家> (忽略或不忽略某玩家.)",
   "help_usage_resetLang": "用法: /aso resetLang (重置语言文件.)",
