@@ -7,5 +7,6 @@
   "help_usage_reload": "Usage: /aso reload (Reload config.)",
   "cmd_reload_success": "Config and Languages are reloaded.",
   "cmd_ignore_removed": "Success to remove {{playerName}} from you ignore list",
-  "cmd_ignore_added": "Success ignore {{playerName}}."
+  "cmd_ignore_added": "Success ignore {{playerName}}.",
+  "cmd_resetLang_resetFinish": "Success reset language files."
 }
