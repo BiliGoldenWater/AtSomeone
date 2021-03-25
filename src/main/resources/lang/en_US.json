@@ -3,10 +3,15 @@
   "error_onlyPlayerCanUse": "§cOnly player can use this command!",
   "help_usage_help": "Usage: /aso help (Show this message.)",
   "help_usage_ignore": "Usage: /aso ignore <player> (Add or Remove someone in ignore list.)",
+  "help_usage_lang": "Usage: /aso lang <targetLanguage> (Change plugin language.)",
   "help_usage_resetLang": "Usage: /aso resetLang (Reset all language files.)",
   "help_usage_reload": "Usage: /aso reload (Reload config.)",
   "cmd_reload_success": "Config and Languages are reloaded.",
   "cmd_ignore_removed": "Success to remove {{playerName}} from you ignore list",
   "cmd_ignore_added": "Success ignore {{playerName}}.",
+  "cmd_lang_list": "All available languages: \n    {{languages}}",
+  "cmd_lang_successSet": "Success set language to: {{language}}",
+  "cmd_lang_setFail": "Fail to set language to {{language}}:",
+  "cmd_lang_setFail_doesNotExist": "Language doesn't exist.",
   "cmd_resetLang_resetFinish": "Success reset all language files."
 }

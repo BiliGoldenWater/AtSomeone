@@ -37,8 +37,12 @@ public class CommandAtSomeone {
                         return commandIgnore(sender, i18n, lang, noPerm, args, config);
                     case "resetLang":
                         return commandResetLang(sender, i18n, lang, noPerm);
+                    case "lang":
+                        return commandLang(sender, i18n, lang, noPerm, args, config);
                     case "reload":
                         return commandReload(sender, i18n, lang, noPerm);
+                    default:
+                        return false;
                 }
             } else {
                 HelpMessage.sendHelpMessages(sender, i18n, lang, HelpMessage.HelpLvl.fullHelp);
@@ -102,6 +106,50 @@ public class CommandAtSomeone {
         return true;
     }
 
+    private boolean commandLang(CommandSender sender, I18nManager i18n, String lang, String noPerm,
+                                String[] args, Configuration config) {
+        if (!hasPermissions_Tips(sender, "atsomeone.command.lang", noPerm)) return true;
+
+        switch (args.length) {
+            case 1:
+                HelpMessage.sendHelpMessages(sender, i18n, lang, HelpMessage.HelpLvl.commandLang); // 发送命令用法
+
+                List<String> languageList = i18n.getLanguageList();
+                StringBuilder languageListStr = new StringBuilder();
+
+                for (String str : languageList) { // 将语言列表转为字符串
+                    boolean isLast = str.equals(languageList.get(languageList.size() - 1));
+                    languageListStr.append(str).append(isLast ? "." : ", ");
+                }
+
+                String finalMessage = i18n.getL10n(lang, "cmd_lang_list")
+                        .replace("{{languages}}", languageListStr.toString()); // 将语言列表放入消息
+
+                sender.sendMessage(finalMessage);
+                return true;
+            case 2:
+                String message;
+                if (i18n.getLanguageList().contains(args[1].toLowerCase())) {
+                    config.set("pluginLanguage", args[1]);
+                    plugin.saveConfig();
+                    lang = config.getString("pluginLanguage");
+
+                    message = i18n.getL10n(lang, "cmd_lang_successSet");
+                } else {
+                    message = i18n.getL10n(lang, "cmd_lang_setFail");
+                    message += "\n    ";
+                    message += i18n.getL10n(lang, "cmd_lang_setFail_doesNotExist");
+                }
+
+                message = message.replace("{{language}}", args[1]);
+
+                sender.sendMessage(message);
+                return true;
+        }
+
+        return true;
+    }
+
     private boolean commandReload(CommandSender sender, I18nManager i18n, String lang, String noPerm) {
         if (!hasPermissions_Tips(sender, "atsomeone.command.reload", noPerm)) return true;
 
@@ -121,6 +169,7 @@ public class CommandAtSomeone {
                     sender.sendMessage(i18n.getL10n(language, "help_usage_help"));
                     sender.sendMessage(i18n.getL10n(language, "help_usage_ignore"));
                     sender.sendMessage(i18n.getL10n(language, "help_usage_resetLang"));
+                    sender.sendMessage(i18n.getL10n(language, "help_usage_lang"));
                     sender.sendMessage(i18n.getL10n(language, "help_usage_reload"));
                     break;
                 case HelpLvl.commandHelp:
@@ -128,6 +177,9 @@ public class CommandAtSomeone {
                     break;
                 case HelpLvl.commandIgnore:
                     sender.sendMessage(i18n.getL10n(language, "help_usage_ignore"));
+                    break;
+                case HelpLvl.commandLang:
+                    sender.sendMessage(i18n.getL10n(language, "help_usage_lang"));
                     break;
                 case HelpLvl.commandResetLang:
                     sender.sendMessage(i18n.getL10n(language, "help_usage_resetLang"));
@@ -142,8 +194,9 @@ public class CommandAtSomeone {
             public static final int fullHelp = 0;
             public static final int commandHelp = 1;
             public static final int commandIgnore = 2;
-            public static final int commandResetLang = 3;
-            public static final int commandReload = 4;
+            public static final int commandLang = 3;
+            public static final int commandResetLang = 4;
+            public static final int commandReload = 5;
         }
     }
 

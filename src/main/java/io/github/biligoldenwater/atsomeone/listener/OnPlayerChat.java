@@ -24,9 +24,7 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
     public void onPlayerChat(AsyncPlayerChatEvent e) {
         //Start variable initialize
         Plugin plugin = getPluginManager().getPlugin("AtSomeone");
-
         FileConfiguration config = plugin.getConfig();
-        List<String> ignoreList = config.getStringList("playerIgnore." + e.getPlayer().getName());
 
         String message = e.getMessage();
         StringBuilder finalMessage = new StringBuilder("\0");
@@ -44,6 +42,7 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
                 isAtAll = true;
                 strs[i] = "§d§l" + strs[i] + "§r";
                 for (Player player : onlinePlayers) {
+                    List<String> ignoreList = config.getStringList("playerIgnore." + player.getName());
                     if (!CheckIgnore.isIgnore(ignoreList, player, e.getPlayer())) {
                         atPlayer.add(player);
                         strs[i] = "§b§l" + strs[i] + "§r";
@@ -57,6 +56,7 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
             for (int i = 0; i < strs.length; ++i) {
                 for (Player player : onlinePlayers) {
                     if (strs[i].equalsIgnoreCase("@" + player.getName())) {
+                        List<String> ignoreList = config.getStringList("playerIgnore." + player.getName());
                         if (!CheckIgnore.isIgnore(ignoreList, player, e.getPlayer())) {
                             atPlayer.add(player);
                             strs[i] = "§b§l" + strs[i] + "§r";

@@ -30,11 +30,14 @@ permissions:
             default: true
             description: Show help message.
           atsomeone.command.ignore:
-            default: op
+            default: true
             description: Let a player cannot @ you.
           atsomeone.command.resetlang:
             default: op
             description: Reset language files.
+          atsomeone.command.lang:
+            default: op
+            description: Change plugin language.
           atsomeone.command.reload:
             default: op
             description: Reload config.
