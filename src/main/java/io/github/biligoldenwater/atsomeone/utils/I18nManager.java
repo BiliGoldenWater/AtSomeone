@@ -131,6 +131,15 @@ public class I18nManager {
         }
     }
 
+    public List<String> getLanguageList(){
+        List<String> languageList = new ArrayList<>();
+
+        if (!initialized) return languageList; // 检查 初始化 是否完成
+
+        languageList = Arrays.asList(languages.keySet().toArray(new String[]{}));
+        return languageList;
+    }
+
     public void reload() {
         this.initialized = initialize(dataPath, defaultLanguage.toLowerCase()) == StatusCode.success;
     }
