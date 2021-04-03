@@ -13,5 +13,11 @@
   "cmd_lang_successSet": "Success set language to: {{language}}",
   "cmd_lang_setFail": "Fail to set language to {{language}}:",
   "cmd_lang_setFail_doesNotExist": "Language doesn't exist.",
-  "cmd_resetLang_resetFinish": "Success reset all language files."
+  "cmd_resetLang_resetFinish": "Success reset all language files.",
+  "msg_atAll": "§c§l@All§r",
+  "msg_invalidAt": "§7§m{{atContent}}§r",
+  "msg_validAt": "§b§l{{atContent}}§r",
+  "msg_atAlert_title": "You are @.",
+  "msg_atAlert_subtitle": "You are @ by §a{{fromPlayerName}}§r.",
+  "msg_atAlert_chat": "You are @ by §a{{fromPlayerName}}§r."
 }

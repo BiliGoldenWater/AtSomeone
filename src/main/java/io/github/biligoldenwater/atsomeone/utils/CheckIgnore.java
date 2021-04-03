@@ -7,11 +7,11 @@ import java.util.List;
 import static io.github.biligoldenwater.atsomeone.utils.CheckPermissions.hasPermissions;
 
 public class CheckIgnore {
-    public static boolean isIgnore(List<String> atTosIgnoreList, Player atTo, Player atFrom) {
+    public static boolean isIgnore(List<String> atTosIgnoreList, Player atFrom) {
         if (hasPermissions(atFrom, "atsomeone.bypass.ignore")) {
             return false;
         }
-        
-        return atTosIgnoreList.contains(atTo.getName());
+
+        return atTosIgnoreList.contains(atFrom.getName());
     }
 }

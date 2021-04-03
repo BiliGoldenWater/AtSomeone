@@ -9,12 +9,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class AtSomeone extends JavaPlugin {
-    private final AtSomeone instance = this;
+    private static AtSomeone instance;
     private I18nManager i18nManager;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+        instance = this;
+
         Bukkit.getPluginManager().registerEvents(new OnPlayerChat(), this);
         Bukkit.getPluginManager().registerEvents(new OnPlayerChatTabCompleteEvent(), this);
         new CommandAtSomeone(this);
@@ -34,7 +36,7 @@ public final class AtSomeone extends JavaPlugin {
         getLogger().info("AtSomeone disabled");
     }
 
-    public AtSomeone getInstance() {
+    public static AtSomeone getInstance() {
         return instance;
     }
 

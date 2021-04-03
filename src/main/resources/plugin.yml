@@ -1,12 +1,12 @@
 name: AtSomeone
 version: ${project.version}
 main: io.github.biligoldenwater.atsomeone.AtSomeone
-authors: [Golden_Water]
+authors: [ Golden_Water ]
 commands:
   atsomeone:
     description: Plugin main command.
     usage: /aso help
-    aliases: [aso]
+    aliases: [ aso ]
 permissions:
   atsomeone.*:
     default: op
@@ -15,6 +15,9 @@ permissions:
       atsomeone.atall:
         default: op
         description: Allow player to @ all players.
+      atsomeone.at:
+        default: true
+        description: Allow player to @ someone.
       atsomeone.bypass.*:
         default: op
         description: All bypass permission.

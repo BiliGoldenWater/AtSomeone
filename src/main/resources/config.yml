@@ -1,2 +1,10 @@
+# Plugin display language
 pluginLanguage: en_US
+# delete or not delete invalid @ in message
+deleteInvalidAtInMessage: true
+# display time (tick (1s=20t))
+alertTitle:
+  fadeIn: 10
+  stay: 80
+  fadeOut: 10
 playerIgnore: { }

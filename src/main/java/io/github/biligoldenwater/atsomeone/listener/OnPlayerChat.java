@@ -1,110 +1,135 @@
 package io.github.biligoldenwater.atsomeone.listener;
 
-import io.github.biligoldenwater.atsomeone.utils.CheckIgnore;
+import io.github.biligoldenwater.atsomeone.AtSomeone;
+import io.github.biligoldenwater.atsomeone.utils.I18nManager;
 import org.bukkit.Instrument;
 import org.bukkit.Note;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Server;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
-import static org.bukkit.Bukkit.getOnlinePlayers;
-import static org.bukkit.Bukkit.getPluginManager;
+import static io.github.biligoldenwater.atsomeone.utils.CheckIgnore.isIgnore;
 
 public class OnPlayerChat implements org.bukkit.event.Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent e) {
-        //Start variable initialize
-        Plugin plugin = getPluginManager().getPlugin("AtSomeone");
-        FileConfiguration config = plugin.getConfig();
+        AtSomeone plugin = AtSomeone.getInstance(); // 插件实例
 
-        String message = e.getMessage();
-        StringBuilder finalMessage = new StringBuilder("\0");
+        Configuration config = plugin.getConfig(); // 配置文件
+        Server server = plugin.getServer(); // 服务器实例
 
-        List<Player> atPlayer = new ArrayList<>();
-        Collection<? extends Player> onlinePlayers = getOnlinePlayers();
-        String[] strs = message.split("[\\[\\]]");
+        I18nManager i18n = plugin.getI18nManager(); // 国际化管理器实例
+        String lang = config.getString("pluginLanguage"); // 获取插件语言
 
-        boolean isAtAll = false;
-        boolean hasAt = false;
-        //Finish variable initialize
+        Player player = e.getPlayer(); // 玩家实例
 
-        for (int i = 0; i < strs.length; ++i) {
-            if (strs[i].equalsIgnoreCase("@All") && e.getPlayer().hasPermission("atsomeone.atall")) {
-                isAtAll = true;
-                strs[i] = "§d§l" + strs[i] + "§r";
-                for (Player player : onlinePlayers) {
-                    List<String> ignoreList = config.getStringList("playerIgnore." + player.getName());
-                    if (!CheckIgnore.isIgnore(ignoreList, player, e.getPlayer())) {
-                        atPlayer.add(player);
-                        strs[i] = "§b§l" + strs[i] + "§r";
-                        hasAt = true;
-                    }
+        String[] strings = e.getMessage().split("[\\[\\]]"); // 分割
+        List<String> stringsLowerCase = Arrays.asList(
+                e.getMessage().toLowerCase().split("[\\[\\]]")); // 分割并转为全小写
+
+        if (stringsLowerCase.contains("@all") &&
+                player.hasPermission("atsomeone.atall")) { // 如果包含有@all 并且有权限
+            for (int i = 0; i < stringsLowerCase.size(); i++) { // 处理@all
+                String str = stringsLowerCase.get(i);
+
+                if (str.equalsIgnoreCase("@all")) { // 如果为@all
+                    strings[i] = i18n.getL10n(lang, "msg_atAll"); // 替换为@all消息
+                } else if (str.startsWith("@")) { // 否则 如果为@消息
+                    strings[i] = invalidAt(config, str, i18n, lang); // 替换为无效@消息
                 }
             }
-        }
+            e.setMessage(atAlert(server.getOnlinePlayers(), player.getDisplayName(), strings, config, i18n, lang)); // 设置为替换后的消息并提醒
+        } else if (player.hasPermission("atsomeone.at")) { // 如果有@的权限
+            List<Player> atList = new ArrayList<>(); // 被@的玩家列表
 
-        if (!isAtAll) {
-            for (int i = 0; i < strs.length; ++i) {
-                for (Player player : onlinePlayers) {
-                    if (strs[i].equalsIgnoreCase("@" + player.getName())) {
-                        List<String> ignoreList = config.getStringList("playerIgnore." + player.getName());
-                        if (!CheckIgnore.isIgnore(ignoreList, player, e.getPlayer())) {
-                            atPlayer.add(player);
-                            strs[i] = "§b§l" + strs[i] + "§r";
-                        } else {
-                            strs[i] = "§c§m" + strs[i] + "§r";
+            for (int i = 0; i < stringsLowerCase.size(); i++) { // 遍历所有被分割的字符串
+                String str = stringsLowerCase.get(i);
+
+                if (str.length() > 1) {
+                    Player playerBeAt = server.getPlayer(str.substring(1)); // 尝试获取玩家实例
+
+                    if (playerBeAt != null) { // 如果不为null
+                        if (isIgnore(config.getStringList("playerIgnore." + playerBeAt.getName()), player) ||
+                                atList.contains(playerBeAt)) { // 如果被忽略 或 已加入被@的列表
+                            strings[i] = invalidAt(config, str, i18n, lang); // 替换为无效@消息
+                        } else { // 否则
+                            String atContent = "@" + playerBeAt.getDisplayName(); // 获取@内容
+                            strings[i] = i18n.getL10n(lang, "msg_validAt")
+                                    .replace("{{atContent}}", atContent); // 替换为有效@消息
+                            atList.add(playerBeAt); // 添加至被@列表
                         }
-                        hasAt = true;
+                    } else {
+                        strings[i] = invalidAt(config, str, i18n, lang); // 替换为无效@消息
                     }
                 }
             }
+
+            e.setMessage(atAlert(atList, player.getDisplayName(), strings, config, i18n, lang)); // 设置消息并提醒
         }
 
-        for (String str : strs) {
-            if (finalMessage.toString().equals("\0")) {
-                finalMessage = new StringBuilder(str);
-            } else {
-                finalMessage.append(str);
-            }
+
+    }
+
+    public String invalidAt(Configuration config, String atContent, I18nManager i18n, String lang) {
+        if (config.getBoolean("deleteInvalidAtInMessage")) {
+            return "";
+        } else {
+            return i18n.getL10n(lang, "msg_invalidAt")
+                    .replace("{{atContent}}", atContent);
+        }
+    }
+
+    private String atAlert(Collection<? extends Player> players,
+                           String fromPlayerName,
+                           String[] message,
+                           Configuration config, I18nManager i18n,
+                           String lang) {
+        StringBuilder finalMessage = new StringBuilder();
+
+        for (String str : message) {
+            finalMessage.append(str);
         }
 
-        if (hasAt) {
-            e.setMessage(finalMessage.toString());
-            for (Player atPlayer2 : atPlayer) {
-                if (strs.length > 1) {
-                    atPlayer2.sendTitle("§b你被§d" + e.getPlayer().getName() + "§b@了",
-                            "§d" + e.getPlayer().getName() + "§b@了你并对你说: " + finalMessage,
-                            10, 80, 10);
-                } else {
-                    atPlayer2.sendTitle("§b你被§d" + e.getPlayer().getName() + "§b@了",
-                            "§d" + e.getPlayer().getName() + "§b@了你.",
-                            10, 80, 10);
+        for (Player player : players) {
+            String msg_atAlert_title = i18n.getL10n(lang, "msg_atAlert_title")
+                    .replace("{{fromPlayerName}}", fromPlayerName);
+            String msg_atAlert_subtitle = i18n.getL10n(lang, "msg_atAlert_subtitle")
+                    .replace("{{fromPlayerName}}", fromPlayerName);
+            String msg_atAlert_chat = i18n.getL10n(lang, "msg_atAlert_chat")
+                    .replace("{{fromPlayerName}}", fromPlayerName);
+            int fadeIn = config.getInt("alertTitle.fadeIn");
+            int stay = config.getInt("alertTitle.stay");
+            int fadeOut = config.getInt("alertTitle.fadeOut");
+
+            player.sendTitle(msg_atAlert_title,
+                    msg_atAlert_subtitle,
+                    fadeIn, stay, fadeOut);
+
+            player.sendMessage(msg_atAlert_chat);
+            new BukkitRunnable() {
+                int count = 0;
+
+                @Override
+                public void run() {
+                    player.playNote(player.getLocation(), Instrument.BELL, new Note(6));
+                    count++;
+                    if (count > 2) cancel();
                 }
-
-                atPlayer2.sendMessage("§b你被§d" + e.getPlayer().getName() + "§b@了. 打开聊天栏输入@按Tab即可使用@.");
-                new BukkitRunnable() {
-                    int count = 0;
-
-                    @Override
-                    public void run() {
-                        atPlayer2.playNote(atPlayer2.getLocation(), Instrument.BELL, new Note(6));
-                        count++;
-                        if (count > 2) cancel();
-                    }
-                }.runTaskTimerAsynchronously(
-                        Objects.requireNonNull(getPluginManager().getPlugin("AtSomeone")),
-                        0,
-                        2);
-            }
+            }.runTaskTimerAsynchronously(
+                    AtSomeone.getInstance(),
+                    0,
+                    2);
         }
+
+        return finalMessage.toString();
     }
 }
