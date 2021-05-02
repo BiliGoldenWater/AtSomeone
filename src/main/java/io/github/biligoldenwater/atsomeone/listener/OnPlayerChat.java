@@ -47,14 +47,14 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
                     strings[i] = invalidAt(config, str, i18n, lang); // 替换为无效@消息
                 }
             }
-            e.setMessage(atAlert(server.getOnlinePlayers(), player.getDisplayName(), strings, config, i18n, lang)); // 设置为替换后的消息并提醒
+            e.setMessage(atAlert(server.getOnlinePlayers(), player, strings, config, i18n, lang)); // 设置为替换后的消息并提醒
         } else if (player.hasPermission("atsomeone.at")) { // 如果有@的权限
             List<Player> atList = new ArrayList<>(); // 被@的玩家列表
 
             for (int i = 0; i < stringsLowerCase.size(); i++) { // 遍历所有被分割的字符串
                 String str = stringsLowerCase.get(i);
 
-                if (str.length() > 1) {
+                if (str.length() > 1 && str.startsWith("@")) {
                     Player playerBeAt = server.getPlayer(str.substring(1)); // 尝试获取玩家实例
 
                     if (playerBeAt != null) { // 如果不为null
@@ -73,7 +73,7 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
                 }
             }
 
-            e.setMessage(atAlert(atList, player.getDisplayName(), strings, config, i18n, lang)); // 设置消息并提醒
+            e.setMessage(atAlert(atList, player, strings, config, i18n, lang)); // 设置消息并提醒
         }
 
 
@@ -89,11 +89,12 @@ public class OnPlayerChat implements org.bukkit.event.Listener {
     }
 
     private String atAlert(Collection<? extends Player> players,
-                           String fromPlayerName,
+                           Player fromPlayer,
                            String[] message,
                            Configuration config, I18nManager i18n,
                            String lang) {
-        StringBuilder finalMessage = new StringBuilder();
+        final StringBuilder finalMessage = new StringBuilder();
+        final String fromPlayerName = fromPlayer.getDisplayName();
 
         for (String str : message) {
             finalMessage.append(str);
